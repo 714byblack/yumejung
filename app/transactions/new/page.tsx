@@ -1,10 +1,10 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Borrower } from '@/lib/types'
 
-export default function NewTransactionPage() {
+function NewTransactionForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [borrowers, setBorrowers] = useState<Borrower[]>([])
@@ -57,7 +57,6 @@ export default function NewTransactionPage() {
       </div>
 
       <div className="space-y-4">
-        {/* ยืม / คืน toggle */}
         <div className="flex rounded-lg overflow-hidden border border-gray-200">
           {(['borrow', 'repay'] as const).map(t => (
             <button key={t} onClick={() => setType(t)}
@@ -113,5 +112,13 @@ export default function NewTransactionPage() {
         </button>
       </div>
     </main>
+  )
+}
+
+export default function NewTransactionPage() {
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-gray-400">กำลังโหลด...</div>}>
+      <NewTransactionForm />
+    </Suspense>
   )
 }
