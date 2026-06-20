@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase'
 import { Transaction } from '@/lib/types'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import DeleteTransactionButton from './DeleteTransactionButton'
 
 export default async function BorrowerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -28,6 +29,10 @@ export default async function BorrowerPage({ params }: { params: Promise<{ id: s
           <h1 className="text-xl font-semibold">{borrower.name}</h1>
           {borrower.phone && <p className="text-sm text-gray-400">{borrower.phone}</p>}
         </div>
+        <Link href={`/borrowers/${id}/edit`}
+          className="text-sm text-gray-500 border border-gray-200 px-3 py-2 rounded-lg hover:border-gray-400">
+          แก้ไข
+        </Link>
         <Link href={`/transactions/new?borrower=${id}`}
           className="bg-black text-white text-sm px-4 py-2 rounded-lg hover:bg-gray-800">
           + บันทึก
@@ -74,9 +79,12 @@ export default async function BorrowerPage({ params }: { params: Promise<{ id: s
                   )}
                 </div>
               </div>
-              <p className={`font-semibold ${t.type === 'borrow' ? 'text-red-500' : 'text-green-600'}`}>
-                {t.type === 'borrow' ? '-' : '+'}฿{Number(t.amount).toLocaleString()}
-              </p>
+              <div className="flex items-center gap-3">
+                <p className={`font-semibold ${t.type === 'borrow' ? 'text-red-500' : 'text-green-600'}`}>
+                  {t.type === 'borrow' ? '-' : '+'}฿{Number(t.amount).toLocaleString()}
+                </p>
+                <DeleteTransactionButton id={t.id} />
+              </div>
             </div>
           ))}
         </div>
