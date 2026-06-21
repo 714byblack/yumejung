@@ -15,6 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: 'Yumejung',
   description: 'บันทึกการยืมเงิน',
+  manifest: '/manifest.webmanifest',
 }
 
 export default function RootLayout({
