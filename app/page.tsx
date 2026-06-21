@@ -32,6 +32,7 @@ export default function DashboardPage() {
   const filtered = summaries
     .filter(b => filter === 'all' || (filter === 'pending' ? b.balance > 0 : b.balance <= 0))
     .filter(b => b.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => b.balance - a.balance)
 
   const totalBalance = summaries.reduce((s, b) => s + b.balance, 0)
   const activeCount = summaries.filter(b => b.balance > 0).length
