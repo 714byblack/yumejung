@@ -79,9 +79,15 @@ export default function BorrowerPage({ params }: { params: Promise<{ id: string 
                   <p className="text-sm text-gray-500">{t.date}</p>
                   {t.note && <p className="text-sm text-gray-400">{t.note}</p>}
                   {t.slip_url && (
-                    <a href={t.slip_url} target="_blank" rel="noreferrer"
-                      className="text-xs text-blue-500 hover:underline">ดูสลิป</a>
-                  )}
+  <div className="flex gap-2 flex-wrap">
+    {t.slip_url.split(',').map((url: string, i: number) => (
+      <a key={i} href={url} target="_blank" rel="noreferrer"
+        className="text-xs text-blue-500 hover:underline">
+        ดูสลิป {t.slip_url!.split(',').length > 1 ? i + 1 : ''}
+      </a>
+    ))}
+  </div>
+)}
                 </div>
               </div>
               <div className="flex items-center gap-3">

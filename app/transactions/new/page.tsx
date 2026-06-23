@@ -13,7 +13,7 @@ function NewTransactionForm() {
   const [amount, setAmount] = useState('')
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   const [note, setNote] = useState('')
-  const [slip, setSlip] = useState<File | null>(null)
+  const [slips, setSlips] = useState<File[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
@@ -26,15 +26,16 @@ function NewTransactionForm() {
     if (!borrowerId || !amount) return
     setLoading(true)
 
-    let slip_url: string | null = null
-    if (slip) {
-      const ext = slip.name.split('.').pop()
-      const path = `${borrowerId}/${Date.now()}.${ext}`
-      const { error: uploadError } = await supabase.storage.from('slips').upload(path, slip)
-      if (uploadError) { alert('อัปโหลดสลิปไม่ได้: ' + uploadError.message); setLoading(false); return }
-      const { data } = supabase.storage.from('slips').getPublicUrl(path)
-      slip_url = data.publicUrl
-    }
+    const slip_urls: string[] = []
+for (const slip of slips) {
+  const ext = slip.name.split('.').pop()
+  const path = `${borrowerId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+  const { error: uploadError } = await supabase.storage.from('slips').upload(path, slip)
+  if (uploadError) { alert('อัปโหลดสลิปไม่ได้: ' + uploadError.message); setLoading(false); return }
+  const { data } = supabase.storage.from('slips').getPublicUrl(path)
+  slip_urls.push(data.publicUrl)
+}
+const slip_url = slip_urls.length > 0 ? slip_urls.join(',') : null
 
     const { error } = await supabase.from('transactions').insert({
       borrower_id: borrowerId,
@@ -93,10 +94,16 @@ function NewTransactionForm() {
           <label className="block text-sm text-gray-600 mb-1">
             แนบสลิป {type === 'repay' && <span className="text-gray-400">(ไม่บังคับ)</span>}
           </label>
-          <input type="file" accept="image/*"
-            onChange={e => setSlip(e.target.files?.[0] ?? null)}
-            className="w-full text-sm text-gray-500" />
-          {slip && <p className="text-xs text-gray-400 mt-1">{slip.name}</p>}
+          <input type="file" accept="image/*" multiple
+  onChange={e => setSlips(Array.from(e.target.files ?? []))}
+  className="w-full text-sm text-gray-500" />
+{slips.length > 0 && (
+  <div className="mt-1 space-y-0.5">
+    {slips.map((f, i) => (
+      <p key={i} className="text-xs text-gray-400">{f.name}</p>
+    ))}
+  </div>
+)}
         </div>
 
         <div>
